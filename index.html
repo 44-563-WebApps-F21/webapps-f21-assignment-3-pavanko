@@ -13,40 +13,143 @@
         Miami is known for its white-sand beaches, warm climate, <b>delicious cuisine</b>, Cuban coffee, and its
         Latin-American influences. Some popular attractions include Miami Beach, South Beach, Zoo Miami, Bayside
         Marketplace, Little Havana, Ocean Drive, and Deering Estate.<b>Not a lot of people go through life without
-        hearing about the iconic Miami Beach</b>.Anyone can find something they love on Miami Beach, whether it is the
+            hearing about the iconic Miami Beach</b>.Anyone can find something they love on Miami Beach, whether it is
+        the
         dining, ocean views, resorts, or nightlife.
     </P>
     <hr>
     <h3>DIRECTIONS TO MIAMI</h3>
-<ol>
-    <o1> Head southwest on East Broadway Avenue</o1>
- <o1>Make a slight right onto West Lamar Alexander Parkway</o1>
-   <l1> Turn left towards I 75 South</l1>	
-   <li>  Merge left onto I 75 S	</li>
-   <li>  Keep right onto I 75 S</li>	
-     <li>Keep left onto I 75 S	</li>
-<ol>Take the ramp towards SR 60: Cleveland</ol>
-    <li>Turn right onto Georgetown Road Northwest</li> 	
-    <li>ontinue onto 25th Street Northwest</li>
-    <li>Continue onto Appalachian Highway </li>	
-<ol>Take the ramp towards I 195 East: Miami Beach</ol>
-    <li>Keep left towards I 195 East: Miami Beach</li>	
-    <li>Continue onto Julia Tuttle Causeway </li>
-<ol>You have arrived at your destination, on the right</ol>
-<ul>
-    <li>Food Needed</li>
-    <ul>
-        <li>Burgers</li>
-        <li>Pizzas</li>
-    </ul>
-</ul>
-<ul>
-    <li>Cool Drinks</li>
-    <ul>
-        <li>Coke</li>
-        <li>Tropicana</li>
-    </ul>
-</ul>
-</ol>
-
+    <ol>
+        <o1> Head southwest on East Broadway Avenue</o1>
+        <o1>Make a slight right onto West Lamar Alexander Parkway</o1>
+        <l1> Turn left towards I 75 South</l1>
+        <li> Merge left onto I 75 S </li>
+        <li> Keep right onto I 75 S</li>
+        <li>Keep left onto I 75 S </li>
+        <ol>Take the ramp towards SR 60: Cleveland</ol>
+        <li>Turn right onto Georgetown Road Northwest</li>
+        <li>ontinue onto 25th Street Northwest</li>
+        <li>Continue onto Appalachian Highway </li>
+        <ol>Take the ramp towards I 195 East: Miami Beach</ol>
+        <li>Keep left towards I 195 East: Miami Beach</li>
+        <li>Continue onto Julia Tuttle Causeway </li>
+        <ol>You have arrived at your destination, on the right</ol>
+        <ul>
+            <li>Food Needed</li>
+            <ul>
+                <li>Burgers</li>
+                <li>Pizzas</li>
+            </ul>
+        </ul>
+        <ul>
+            <li>Cool Drinks</li>
+            <ul>
+                <li>Coke</li>
+                <li>Tropicana</li>
+            </ul>
+        </ul>
+    </ol>
+    <a href="C:\Users\s545220\Desktop\webapps-repo\webapps-f21-assignment-3-pavanko\aboutme.html">link to my fav
+        person</a>
+    <hr>
+    <h2>RECOMMENDED FOODS AND DRINKS</h2>
+    <P>The below items must be useful:</P>
+    <table border="1">
+        <tr>
+            <th>Food/Drink</th>
+            <th>location</th>
+            <th>Price</th>
+        </tr>
+        <tr>
+            <td>Pizza</td>
+            <td>Maryville</td>
+            <td align="right">$3.0</td>
+        </tr>
+        <tr>
+            <td>Tropicana</td>
+            <td>Cleveland</td>
+            <td align="right">$0.50</td>
+        </tr>
+        <tr>
+            <td>Taccos</td>
+            <td>Miami</td>
+            <td align="right">$6.0</td>
+        </tr>
+    </table>
+    <hr>
+    <h2>ANCESTORS</h2>
+    <blockquote cite="https://cp-algorithms.com/graph/lca.html">
+        Before answering the queries, we need to preprocess the tree. We make a DFS traversal starting at the root and
+        we build a list euler which stores the order of the vertices that we visit (a vertex is added to the list when
+        we first visit it, and after the return of the DFS traversals to its children). This is also called an Euler
+        tour of the tree. It is clear that the size of this list will be O(N). We also need to build an array
+        first[0..N−1] which stores for each vertex i its first occurrence in euler. That is, the first position in euler
+        such that euler[first[i]]=i. Also by using the DFS we can find the height of each node (distance from root to
+        it) and store it in the array height[0..N−1]
+    </blockquote>
+    <pre>
+        struct LCA {
+            vector<int> height, euler, first, segtree;
+            vector<bool> visited;
+            int n;
+        
+            LCA(vector<vector<int>> &adj, int root = 0) {
+                n = adj.size();
+                height.resize(n);
+                first.resize(n);
+                euler.reserve(n * 2);
+                visited.assign(n, false);
+                dfs(adj, root);
+                int m = euler.size();
+                segtree.resize(m * 4);
+                build(1, 0, m - 1);
+            }
+        
+            void dfs(vector<vector<int>> &adj, int node, int h = 0) {
+                visited[node] = true;
+                height[node] = h;
+                first[node] = euler.size();
+                euler.push_back(node);
+                for (auto to : adj[node]) {
+                    if (!visited[to]) {
+                        dfs(adj, to, h + 1);
+                        euler.push_back(node);
+                    }
+                }
+            }
+        
+            void build(int node, int b, int e) {
+                if (b == e) {
+                    segtree[node] = euler[b];
+                } else {
+                    int mid = (b + e) / 2;
+                    build(node << 1, b, mid);
+                    build(node << 1 | 1, mid + 1, e);
+                    int l = segtree[node << 1], r = segtree[node << 1 | 1];
+                    segtree[node] = (height[l] < height[r]) ? l : r;
+                }
+            }
+        
+            int query(int node, int b, int e, int L, int R) {
+                if (b > R || e < L)
+                    return -1;
+                if (b >= L && e <= R)
+                    return segtree[node];
+                int mid = (b + e) >> 1;
+        
+                int left = query(node << 1, b, mid, L, R);
+                int right = query(node << 1 | 1, mid + 1, e, L, R);
+                if (left == -1) return right;
+                if (right == -1) return left;
+                return height[left] < height[right] ? left : right;
+            }
+        
+            int lca(int u, int v) {
+                int left = first[u], right = first[v];
+                if (left > right)
+                    swap(left, right);
+                return query(1, 0, euler.size() - 1, left, right);
+            }
+        }
+    </pre>
 </body>
